@@ -1,0 +1,273 @@
+/* ============================================================
+   VITHAL AI — Proprietary AI Assistant Stylesheet
+   Matches the Vithal Technology neon cyber identity.
+   ============================================================ */
+
+:root {
+  --va-cyan: #00f0ff;
+  --va-blue: #00c2ff;
+  --va-purple: #8b5cf6;
+  --va-magenta: #e94cff;
+  --va-bg: rgba(6, 10, 22, 0.92);
+  --va-glass: rgba(12, 20, 42, 0.66);
+  --va-border: rgba(0, 194, 255, 0.28);
+  --va-text: #e8f1ff;
+  --va-dim: #93a5c8;
+  --va-grad: linear-gradient(110deg, var(--va-cyan), var(--va-blue) 45%, var(--va-purple) 78%, var(--va-magenta));
+  --va-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ----------------------------------------------------------
+   FLOATING VITHAL AI BUTTON
+   ---------------------------------------------------------- */
+#vithal-ai-fab {
+  position: fixed; right: 24px; bottom: 96px; z-index: 810;
+  width: 64px; height: 64px; border-radius: 50%;
+  display: grid; place-items: center; border: none; cursor: pointer;
+  background: radial-gradient(circle at 32% 28%, rgba(0, 240, 255, 0.28), rgba(8, 12, 28, 0.95) 62%);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55), 0 0 26px rgba(0, 194, 255, 0.45), inset 0 0 18px rgba(139, 92, 246, 0.25);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: transform 0.35s var(--va-ease), box-shadow 0.35s;
+  animation: vaFabFloat 4.5s ease-in-out infinite;
+}
+@keyframes vaFabFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+#vithal-ai-fab::before { /* pulse halo */
+  content: ''; position: absolute; inset: -5px; border-radius: 50%;
+  border: 1.5px solid rgba(0, 240, 255, 0.55);
+  animation: vaPulse 3s ease-out infinite;
+  pointer-events: none;
+}
+@keyframes vaPulse {
+  0%   { transform: scale(0.9); opacity: 0.9; }
+  70%, 100% { transform: scale(1.55); opacity: 0; }
+}
+#vithal-ai-fab:hover { transform: scale(1.08); box-shadow: 0 12px 32px rgba(0,0,0,.6), 0 0 42px rgba(139, 92, 246, 0.6), inset 0 0 22px rgba(0, 240, 255, 0.3); }
+#vithal-ai-fab .va-fab-core {
+  width: 40px; height: 40px; position: relative; display: grid; place-items: center;
+}
+#vithal-ai-fab .va-fab-core svg { width: 38px; height: 38px; filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.8)); }
+#vithal-ai-fab .va-orbit-dot {
+  position: absolute; width: 5px; height: 5px; border-radius: 50%; background: var(--va-cyan);
+  box-shadow: 0 0 8px var(--va-cyan);
+  animation: vaOrbit 4s linear infinite;
+}
+#vithal-ai-fab .va-orbit-dot--2 { background: var(--va-magenta); box-shadow: 0 0 8px var(--va-magenta); animation-duration: 6.5s; animation-direction: reverse; }
+@keyframes vaOrbit {
+  from { transform: rotate(0deg) translateX(21px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(21px) rotate(-360deg); }
+}
+#vithal-ai-fab .va-tooltip {
+  position: absolute; right: calc(100% + 14px); top: 50%; transform: translateY(-50%) translateX(6px);
+  white-space: nowrap; padding: 8px 16px; border-radius: 10px;
+  background: var(--va-glass); border: 1px solid var(--va-border);
+  color: var(--va-text); font-size: 0.76rem; font-weight: 600; letter-spacing: 0.08em;
+  backdrop-filter: blur(10px);
+  opacity: 0; pointer-events: none; transition: 0.3s var(--va-ease);
+}
+#vithal-ai-fab:hover .va-tooltip, #vithal-ai-fab:focus-visible .va-tooltip { opacity: 1; transform: translateY(-50%) translateX(0); }
+#vithal-ai-fab .va-notify { /* "new" badge until first open */
+  position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; border-radius: 50%;
+  background: var(--va-magenta); box-shadow: 0 0 10px var(--va-magenta);
+  border: 2px solid var(--black);
+}
+
+/* ----------------------------------------------------------
+   CHAT WINDOW
+   ---------------------------------------------------------- */
+#vithal-ai-chat {
+  position: fixed; right: 24px; bottom: 96px; z-index: 820;
+  width: 400px; height: min(650px, calc(100vh - 130px));
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 22px;
+  background: var(--va-bg);
+  border: 1px solid var(--va-border);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.65), 0 0 44px rgba(0, 194, 255, 0.16);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  opacity: 0; visibility: hidden; transform: translateY(28px) scale(0.96);
+  transition: opacity 0.4s var(--va-ease), transform 0.4s var(--va-ease), visibility 0.4s;
+}
+#vithal-ai-chat.is-open { opacity: 1; visibility: visible; transform: none; }
+#vithal-ai-chat.is-minimized { height: 68px; }
+#vithal-ai-chat.is-minimized .va-body, #vithal-ai-chat.is-minimized .va-input-zone { display: none; }
+
+/* Chat background grid */
+#vithal-ai-chat::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0, 194, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 194, 255, 0.04) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+/* ---- Header ---- */
+.va-header {
+  position: relative; z-index: 2; flex: none;
+  display: flex; align-items: center; gap: 13px;
+  padding: 14px 16px;
+  background: linear-gradient(120deg, rgba(0, 194, 255, 0.12), rgba(139, 92, 246, 0.12) 60%, rgba(233, 76, 255, 0.08));
+  border-bottom: 1px solid var(--va-border);
+}
+.va-avatar {
+  position: relative; width: 46px; height: 46px; flex: none; border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 34% 30%, rgba(0, 240, 255, 0.3), rgba(8, 12, 28, 0.95) 65%);
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  box-shadow: 0 0 18px rgba(0, 194, 255, 0.5), inset 0 0 12px rgba(139, 92, 246, 0.3);
+}
+.va-avatar svg { width: 28px; height: 28px; filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.9)); }
+.va-avatar::after {
+  content: ''; position: absolute; inset: -4px; border-radius: 50%;
+  border: 1px dashed rgba(0, 240, 255, 0.4);
+  animation: vaAvatarSpin 9s linear infinite;
+}
+@keyframes vaAvatarSpin { to { transform: rotate(360deg); } }
+.va-online {
+  position: absolute; bottom: 0; right: 0; width: 11px; height: 11px; border-radius: 50%;
+  background: #2fe07a; border: 2px solid #060a16; box-shadow: 0 0 8px #2fe07a;
+}
+.va-head-text { flex: 1; min-width: 0; }
+.va-head-text b {
+  display: block; font-size: 0.94rem; font-weight: 800; letter-spacing: 0.22em;
+  background: var(--va-grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.va-head-text small { display: block; color: var(--va-dim); font-size: 0.68rem; letter-spacing: 0.05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.va-head-btn {
+  width: 36px; height: 36px; flex: none; display: grid; place-items: center;
+  border-radius: 10px; border: 1px solid transparent; background: transparent;
+  color: var(--va-dim); cursor: pointer; transition: 0.25s;
+}
+.va-head-btn:hover { color: #fff; border-color: var(--va-border); background: rgba(0, 194, 255, 0.08); }
+.va-head-btn svg { width: 17px; height: 17px; }
+
+/* ---- Messages ---- */
+.va-body {
+  position: relative; z-index: 1; flex: 1; overflow-y: auto;
+  padding: 20px 16px 12px; display: flex; flex-direction: column; gap: 14px;
+  overscroll-behavior: contain;
+}
+.va-body::-webkit-scrollbar { width: 6px; }
+.va-body::-webkit-scrollbar-thumb { background: rgba(0, 194, 255, 0.3); border-radius: 6px; }
+
+.va-msg { display: flex; gap: 9px; max-width: 88%; animation: vaMsgIn 0.45s var(--va-ease) both; }
+@keyframes vaMsgIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.va-msg--bot { align-self: flex-start; }
+.va-msg--user { align-self: flex-end; flex-direction: row-reverse; }
+.va-msg-avatar {
+  width: 28px; height: 28px; flex: none; margin-top: 3px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 34% 30%, rgba(0, 240, 255, 0.25), rgba(8, 12, 28, 0.95) 65%);
+  border: 1px solid rgba(0, 240, 255, 0.45);
+}
+.va-msg-avatar svg { width: 16px; height: 16px; color: var(--va-cyan); }
+.va-bubble {
+  padding: 12px 15px; border-radius: 15px; font-size: 0.88rem; line-height: 1.55;
+  white-space: pre-line; word-wrap: break-word;
+}
+.va-msg--bot .va-bubble {
+  color: var(--va-text);
+  background: var(--va-glass);
+  border: 1px solid var(--va-border);
+  border-top-left-radius: 5px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(8px);
+}
+.va-msg--user .va-bubble {
+  color: #fff; border-top-right-radius: 5px;
+  background: linear-gradient(120deg, rgba(0, 148, 255, 0.75), rgba(139, 92, 246, 0.75));
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3), 0 0 16px rgba(0, 194, 255, 0.15);
+}
+.va-bubble ul { margin: 6px 0 2px; padding-left: 18px; }
+.va-bubble li { margin: 3px 0; }
+.va-bubble strong { color: var(--va-cyan); }
+
+/* Quick-reply chips */
+.va-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.va-chip {
+  padding: 8px 14px; border-radius: 999px; cursor: pointer;
+  font-family: inherit; font-size: 0.76rem; font-weight: 600; letter-spacing: 0.04em;
+  color: var(--va-cyan); background: rgba(0, 194, 255, 0.07);
+  border: 1px solid rgba(0, 194, 255, 0.4);
+  transition: 0.25s;
+}
+.va-chip:hover { color: #031018; background: var(--va-cyan); box-shadow: 0 0 16px rgba(0, 240, 255, 0.5); transform: translateY(-1px); }
+.va-chip--wa { color: #2fe07a; border-color: rgba(47, 224, 122, 0.5); background: rgba(47, 224, 122, 0.07); }
+.va-chip--wa:hover { color: #04170c; background: #2fe07a; box-shadow: 0 0 16px rgba(47, 224, 122, 0.55); }
+.va-chip--back { color: var(--va-magenta); border-color: rgba(233, 76, 255, 0.45); background: rgba(233, 76, 255, 0.06); }
+.va-chip--back:hover { color: #fff; background: var(--va-magenta); box-shadow: 0 0 16px rgba(233, 76, 255, 0.5); }
+
+/* Typing indicator */
+.va-typing { display: inline-flex; gap: 5px; align-items: center; padding: 6px 2px; }
+.va-typing i {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--va-cyan);
+  animation: vaTypeDot 1.2s ease-in-out infinite;
+}
+.va-typing i:nth-child(2) { animation-delay: 0.18s; background: var(--va-blue); }
+.va-typing i:nth-child(3) { animation-delay: 0.36s; background: var(--va-purple); }
+@keyframes vaTypeDot { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
+.va-typing-label { font-size: 0.7rem; color: var(--va-dim); margin-left: 6px; letter-spacing: 0.04em; }
+
+/* ---- Input zone ---- */
+.va-input-zone { position: relative; z-index: 2; flex: none; border-top: 1px solid var(--va-border); background: rgba(6, 10, 22, 0.75); }
+
+.va-quickbar { display: flex; gap: 8px; padding: 10px 14px 0; overflow-x: auto; scrollbar-width: none; }
+.va-quickbar::-webkit-scrollbar { display: none; }
+.va-quick {
+  flex: none; display: inline-flex; align-items: center; gap: 7px;
+  padding: 7px 14px; border-radius: 999px; cursor: pointer; font-family: inherit;
+  font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--va-text); background: rgba(12, 20, 42, 0.7);
+  border: 1px solid rgba(0, 194, 255, 0.25); transition: 0.25s;
+}
+.va-quick:hover { border-color: var(--va-cyan); color: var(--va-cyan); box-shadow: 0 0 14px rgba(0, 240, 255, 0.25); }
+.va-quick svg { width: 14px; height: 14px; }
+.va-quick--wa { color: #2fe07a; border-color: rgba(47, 224, 122, 0.35); }
+.va-quick--wa:hover { color: #04170c; background: #2fe07a; }
+
+.va-input-row { display: flex; gap: 10px; padding: 10px 14px 14px; }
+#vithal-ai-input {
+  flex: 1; min-width: 0; padding: 12px 16px; border-radius: 999px;
+  background: rgba(12, 20, 42, 0.75); border: 1px solid rgba(0, 194, 255, 0.25);
+  color: var(--va-text); font-family: inherit; font-size: 0.88rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+#vithal-ai-input::placeholder { color: rgba(147, 165, 200, 0.6); }
+#vithal-ai-input:focus { outline: none; border-color: var(--va-cyan); box-shadow: 0 0 16px rgba(0, 240, 255, 0.25); }
+#vithal-ai-send {
+  width: 46px; height: 46px; flex: none; border: none; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; color: #031018;
+  background: var(--va-grad); box-shadow: 0 0 18px rgba(0, 194, 255, 0.4);
+  transition: transform 0.25s var(--va-ease), box-shadow 0.25s;
+}
+#vithal-ai-send:hover { transform: scale(1.08); box-shadow: 0 0 26px rgba(139, 92, 246, 0.55); }
+#vithal-ai-send:disabled { opacity: 0.5; cursor: default; transform: none; }
+#vithal-ai-send svg { width: 20px; height: 20px; }
+
+.va-foot-note { padding: 0 16px 8px; font-size: 0.62rem; color: rgba(147, 165, 200, 0.55); letter-spacing: 0.06em; text-align: center; }
+
+/* ----------------------------------------------------------
+   RESPONSIVE — chat window
+   ---------------------------------------------------------- */
+@media (max-width: 768px) {
+  #vithal-ai-fab { width: 56px; height: 56px; right: 18px; bottom: 86px; }
+  #vithal-ai-fab .va-fab-core svg { width: 32px; height: 32px; }
+  #vithal-ai-fab .va-tooltip { display: none; }
+  @keyframes vaOrbit {
+    from { transform: rotate(0deg) translateX(18px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(18px) rotate(-360deg); }
+  }
+  #vithal-ai-chat {
+    right: 0; bottom: 0; left: 0; top: auto;
+    width: 100%; height: 100dvh;
+    border-radius: 0; border-left: none; border-right: none; border-bottom: none;
+    transform: translateY(40px);
+  }
+  #vithal-ai-chat.is-open { transform: none; }
+  .va-body { padding: 18px 14px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #vithal-ai-fab, #vithal-ai-fab::before, #vithal-ai-fab .va-orbit-dot,
+  .va-avatar::after { animation: none !important; }
+  .va-msg { animation-duration: 0.15s !important; }
+}
